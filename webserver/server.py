@@ -96,58 +96,88 @@ def login_to():
     if usertype == 'customer':
         global cid
         cid = request.form['loginid']
-        cursor = g.conn.execute("SELECT pid, sum(storage) FROM manage GROUP BY pid ORDER BY pid")
-        results = []
-        results.append("Pid, Storage:")
-        for result in cursor:
-            results.append(result)
-        cursor.close()
-    
-        context = dict(data=results)
-        return render_template("product.html", **context)
+        if not cid.isdigit():
+            context = dict(data=['Sorry, please enter a valid (integer) ID'])
+            return render_template("error.html", **context)
+        else:
+            cursor = g.conn.execute("SELECT * FROM customer WHERE cid=%s", cid)
+            value = cursor.fetchone()
+            cursor.close()
+            if value == None:
+                context = dict(data=['Sorry, your ID does not exist'])
+                return render_template("error.html", **context)
+            else:
+                cursor = g.conn.execute("SELECT pid, sum(storage) FROM manage GROUP BY pid ORDER BY pid")
+                results = []
+                results.append("Pid, Storage:")
+                for result in cursor:
+                    results.append(result)
+                cursor.close()
+            
+                context = dict(data=results)
+                return render_template("product.html", **context)
     else:
         global sid
         sid = request.form['loginid']
-        cursor = g.conn.execute('SELECT pid, storage FROM manage WHERE sid=%s ORDER BY pid', int(sid))
-        results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for result in cursor:
-            if result!='':
-                results[result[0]-10001]=result[1]
-        cursor.close()
-        context = dict(data=results)
-        
-        return render_template("seller.html", **context)
+        if not sid.isdigit():
+            context = dict(data=['Sorry, please enter a valid (integer) ID'])
+            return render_template("error.html", **context)
+        else:
+            cursor = g.conn.execute("SELECT * FROM seller WHERE sid=%s", sid)
+            value = cursor.fetchone()
+            cursor.close()
+            if value == None:
+                context = dict(data=['Sorry, your ID does not exist'])
+                return render_template("error.html", **context)
+            else:
+                cursor = g.conn.execute('SELECT pid, storage FROM manage WHERE sid=%s ORDER BY pid', int(sid))
+                results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                for result in cursor:
+                    if result!='':
+                        results[result[0]-10001]=result[1]
+                cursor.close()
+                context = dict(data=results)
+                
+                return render_template("seller.html", **context)
   
 @app.route('/register_to', methods=['POST'])
 def register_to():
     usertype = request.form['registertype']
     if usertype == 'customer':
         cid = request.form['registerid']
-        name = request.form['registername']
-        cursor = g.conn.execute('INSERT INTO customer(cid, name) VALUES (%s, %s)', (cid, name))
-        cursor = g.conn.execute('INSERT INTO modify_cart(cart_id, name, cid) VALUES (%s, %s, %s)', (int(cid)+100, name, cid))
-        cursor = g.conn.execute("SELECT pid, sum(storage) FROM manage GROUP BY pid ORDER BY pid")
-        results = []
-        results.append("Pid, Storage:")
-        for result in cursor:
-            results.append(result)
-        cursor.close()
-    
-        context = dict(data=results)
-        return render_template("log_in.html", **context)
+        if not cid.isdigit():
+            context = dict(data=['Sorry, please enter a valid (integer) ID'])
+            return render_template("error.html", **context)
+        else:
+            cursor = g.conn.execute("SELECT * FROM customer WHERE cid=%s", cid)
+            value = cursor.fetchone()
+            cursor.close()
+            if value != None:
+                context = dict(data=['Sorry, the ID is taken, please use another one'])
+                return render_template("error.html", **context)
+            else:
+                name = request.form['registername']
+                cursor = g.conn.execute('INSERT INTO customer(cid, name) VALUES (%s, %s)', (cid, name))
+                cursor = g.conn.execute('INSERT INTO modify_cart(cart_id, name, cid) VALUES (%s, %s, %s)', (int(cid)+100, name, cid))
+                cursor.close()
+                return render_template("log_in.html")
     else:
         sid = request.form['registerid']
-        name = request.form['registername']
-        cursor = g.conn.execute('INSERT INTO seller(sid, name) VALUES (%s, %s)', (sid, name))
-        cursor = g.conn.execute('SELECT pid, storage FROM manage WHERE sid=%s ORDER BY pid', int(sid))
-        results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for result in cursor:
-            if result!='':
-                results[result[0]-10001]=result[1]
-        cursor.close()
-        context = dict(data=results)
-        
-        return render_template("log_in.html", **context)
+        if not sid.isdigit():
+            context = dict(data=['Sorry, please enter a valid (integer) ID'])
+            return render_template("error.html", **context)
+        else:
+            cursor = g.conn.execute("SELECT * FROM seller WHERE sid=%s", sid)
+            value = cursor.fetchone()
+            cursor.close()
+            if value != None:
+                context = dict(data=['Sorry, the ID is taken, please use another one'])
+                return render_template("error.html", **context)
+            else:
+                name = request.form['registername']
+                cursor = g.conn.execute('INSERT INTO seller(sid, name) VALUES (%s, %s)', (sid, name))
+                cursor.close()
+                return render_template("log_in.html")
 
 @app.route('/product', methods=['GET', 'POST'])
 def ProductList():
@@ -160,38 +190,51 @@ def ProductList():
 
     context = dict(data=results)
     return render_template("product.html", **context)
-        
+
+
 
 @app.route('/ModifyCart', methods=['POST'])
 def ModifyCart():
-#    cid = request.form['customerid']
     qty=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    qty[0]=request.form['qty1']
-    qty[1]=request.form['qty2']
-    qty[2]=request.form['qty3']
-    qty[3]=request.form['qty4']
-    qty[4]=request.form['qty5']
-    qty[5]=request.form['qty6']
-    qty[6]=request.form['qty7']
-    qty[7]=request.form['qty8']
-    qty[8]=request.form['qty9']
-    qty[9]=request.form['qty10']
-    qty[10]=request.form['qty11']
-    qty[11]=request.form['qty12']
-    qty[12]=request.form['qty13']
-    qty[13]=request.form['qty14']
-    qty[14]=request.form['qty15']
-    
+    for i in range(15):
+        qty[i]=request.form['qty'+str(i+1)]
+        if qty[i] != '':
+            if qty[i][0] == '-':
+                if len(qty[i]) == 1:
+                    context = dict(data=['Sorry, please enter valid numbers'])
+                    return render_template("error_customer.html", **context)
+                elif not qty[i][1:].isdigit():
+                    context = dict(data=['Sorry, please enter valid numbers'])
+                    return render_template("error_customer.html", **context)
+            elif not qty[i].isdigit():
+                context = dict(data=['Sorry, please enter valid numbers'])
+                return render_template("error_customer.html", **context)                 
+                       
     for i in range(15):
         if qty[i]!='':
             cursor = g.conn.execute("SELECT qty FROM represent WHERE cid=%s and pid=%s", (cid, 10001+i))
             old_val = cursor.fetchone()
+            cursor.close()
             if not old_val:
-                engine.execute("""INSERT INTO represent(pid, cid, qty, cart_id) VALUES (%s, %s, %s, %s)""", (10001+i, cid, int(qty[i]), 100+int(cid)))
+                cursor = g.conn.execute("SELECT sum(storage) FROM manage WHERE pid=%s", (10001+i))
+                total_storage = cursor.fetchone()
+                cursor.close()
+                if int(total_storage[0]) < int(qty[i]):
+                    context = dict(data=["Sorry, we don't have enough products, please reduce the size of your order"])
+                    return render_template("error_customer.html", **context)
+                elif int(qty[i])>0:
+                    g.conn.execute("""INSERT INTO represent(pid, cid, qty, cart_id) VALUES (%s, %s, %s, %s)""", (10001+i, cid, int(qty[i]), 100+int(cid)))
             elif (int(old_val[0])+int(qty[i])) <= 0:
                 g.conn.execute('DELETE FROM represent WHERE cid=%s and pid=%s', (cid, 10001+i))
             else:
-                g.conn.execute('UPDATE represent SET qty=%s WHERE cid=%s and pid=%s', (int(old_val[0])+int(qty[i]), cid, 10001+i))
+                cursor = g.conn.execute("SELECT sum(storage) FROM manage WHERE pid=%s", (10001+i))
+                total_storage = cursor.fetchone()
+                cursor.close()
+                if (int(old_val[0])+int(qty[i])) > int(total_storage[0]):
+                    context = dict(data=["Sorry, we don't have enough products, please reduce the size of your order"])
+                    return render_template("error_customer.html", **context)
+                else:
+                    g.conn.execute('UPDATE represent SET qty=%s WHERE cid=%s and pid=%s', (int(old_val[0])+int(qty[i]), cid, 10001+i))
     
     cursor = g.conn.execute("SELECT pid, sum(storage) FROM manage GROUP BY pid ORDER BY pid")
     results = []
@@ -205,7 +248,6 @@ def ModifyCart():
 
 @app.route('/gotocart', methods=['POST'])
 def gotocart():
-#    cid = request.form['customerid']
     cursor = g.conn.execute("""WITH count_pid(pid, count) AS 
                                           (SELECT pid, sum(qty) 
                                           FROM represent GROUP BY pid),
@@ -243,40 +285,36 @@ def StorageList():
 
 @app.route('/ModifyStore', methods=['POST'])
 def ModifyStore():
-#    sid = int(request.form['sellerid'])
+
     qty=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    qty[0]=request.form['qty1']
-    qty[1]=request.form['qty2']
-    qty[2]=request.form['qty3']
-    qty[3]=request.form['qty4']
-    qty[4]=request.form['qty5']
-    qty[5]=request.form['qty6']
-    qty[6]=request.form['qty7']
-    qty[7]=request.form['qty8']
-    qty[8]=request.form['qty9']
-    qty[9]=request.form['qty10']
-    qty[10]=request.form['qty11']
-    qty[11]=request.form['qty12']
-    qty[12]=request.form['qty13']
-    qty[13]=request.form['qty14']
-    qty[14]=request.form['qty15']
+    for i in range(15):
+        qty[i]=request.form['qty'+str(i+1)]
+        if qty[i] != '':
+            if qty[i][0] == '-':
+                if len(qty[i]) == 1:
+                    context = dict(data=['Sorry, please enter valid numbers'])
+                    return render_template("error_seller.html", **context)
+                elif not qty[i][1:].isdigit():
+                    context = dict(data=['Sorry, please enter valid numbers'])
+                    return render_template("error_seller.html", **context)
+            elif not qty[i].isdigit():
+                context = dict(data=['Sorry, please enter valid numbers'])
+                return render_template("error_seller.html", **context)
 
     for i in range(15):
         if qty[i]!='':
             cursor = g.conn.execute("SELECT storage FROM manage WHERE sid=%s and pid=%s", (sid, 10001+i))
             old_val = cursor.fetchone()
-            if old_val==None:
-                g.conn.execute('INSERT INTO manage VALUES (%s, %s, %s)', (sid, 10001+i, int(qty[i])))
-#                cursor = g.conn.execute("SELECT storage FROM manage WHERE sid=%s and pid=%s", (sid, 10001))
-#                value = cursor.fetchone()
-#                g.conn.execute('UPDATE manage SET storage=%s WHERE sid=%s and pid=%s', (int(value[0])+1, sid, 10001))
+            cursor.close()
+            if not old_val:
+                if int(qty[i])>0:
+                    g.conn.execute('INSERT INTO manage VALUES (%s, %s, %s)', (sid, 10001+i, int(qty[i])))
             elif (int(old_val[0])+int(qty[i])) <= 0:
                 g.conn.execute('DELETE FROM manage WHERE sid=%s and pid=%s', (sid, 10001+i))
             else:
                 g.conn.execute('UPDATE manage SET storage=%s WHERE sid=%s and pid=%s', (int(old_val[0])+int(qty[i]), sid, 10001+i))      
 
-    cursor.close()
-  
+
     cursor = g.conn.execute('SELECT pid, storage FROM manage WHERE sid=%s ORDER BY pid', int(sid))
     results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for result in cursor:
@@ -319,6 +357,33 @@ def manageoptions():
 
     context = dict(data=results)
     return render_template("manage.html", **context)
+
+
+@app.route('/go_back_customer', methods=['POST'])
+def go_back_customer():
+    cursor = g.conn.execute("SELECT pid, sum(storage) FROM manage GROUP BY pid ORDER BY pid")
+    results = []
+    results.append("Pid, Storage:")
+    for result in cursor:
+        results.append(result)
+    cursor.close()
+
+    context = dict(data=results)
+    return render_template("product.html", **context)
+
+@app.route('/go_back_seller', methods=['POST'])
+def go_back_seller():
+    cursor = g.conn.execute('SELECT pid, storage FROM manage WHERE sid=%s ORDER BY pid', int(sid))
+    results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for result in cursor:
+        if result!='':
+            results[result[0]-10001]=result[1]
+    cursor.close()
+    context = dict(data=results)
+    
+    return render_template("seller.html", **context)
+
+
 
 @app.route('/')
 def loginpage():
