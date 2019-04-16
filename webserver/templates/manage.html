@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>NanYuan - e-commerce platform</title>
+
+    <link rel= "stylesheet" type= "text/css" href="{{ url_for('static', filename='stylesheet/bootstrap.css') }}" />
+
+    <!-- Custom styles for this template -->
+    <style>
+      body {
+        padding-top: 54px;
+      }
+      @media (min-width: 992px) {
+        body {
+          padding-top: 56px;
+        }
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h2 class="mt-5"><font face="verdana" color="orange">NanYuan - e-commerce platform</font></h2>
+            <p class="lead"><a href="/">Log Out</a></p>
+            <p class="lead">Please select the available queries to our database </p>
+            <form method="POST" action="/manageoptions">
+                  <select name="option">
+                      <option value="customers">Customer List</option>
+                      <option value="sellers">Seller List</option>
+                      <option value="products">Product List</option>
+                      <option value="discounts">View Qualified Products for Discounts</option>
+                  </select>
+                  <input type="submit" value="GO">
+                </p>
+            </form>
+            <br>
+            <p class="lead">
+            <textarea name="results" rows="20" cols="100">
+                {% for n in data %}
+                    {{n}}
+                {% endfor %}
+            </textarea>
+            </p>         
+            </p>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>

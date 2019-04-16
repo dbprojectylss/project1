@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>NanYuan - e-commerce platform</title>
+
+    <!-- Bootstrap core CSS
+    <link href="/templates/css/bootstrap.min.css" rel="stylesheet">
+    -->
+
+    <link rel= "stylesheet" type= "text/css" href="{{ url_for('static', filename='stylesheet/bootstrap.css') }}" />
+
+    <!-- Custom styles for this template -->
+    <style>
+      body {
+        padding-top: 54px;
+      }
+      @media (min-width: 992px) {
+        body {
+          padding-top: 56px;
+        }
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h2 class="mt-5"><font face="verdana" color="orange">NanYuan - e-commerce platform</font></h2>
+            <p class="lead"><a href="/">Log out</a></p>
+            <form method="POST" action="/ModifyStore">
+            <!--    <p class="lead">  Please enter your ID (20001~29999): <input type="int" name="sellerid"></p> -->
+                <p class="lead">  Please enter the Qty you want to modify: <br>
+                <p class="lead">Pid: 10001, Name: Tape, Price: $2.5, Storage: {{data[0]}}, Qty: <input type="int" name="qty1"></p>
+                <p class="lead">Pid: 10002, Name: Ruler, Price: $3.5, Storage: {{data[1]}}, Qty: <input type="int" name="qty2"></p>
+                <p class="lead">Pid: 10003, Name: Pencil, Price: $2.0, Storage: {{data[2]}}, Qty: <input type="int" name="qty3"></p>
+                <p class="lead">Pid: 10004, Name: Pen, Price: $5.0, Storage: {{data[3]}}, Qty: <input type="int" name="qty4"></p>
+                <p class="lead">Pid: 10005, Name: Paper, Price: $20.0, Storage: {{data[4]}}, Qty: <input type="int" name="qty5"></p>
+                <p class="lead">Pid: 10006, Name: Protractor, Price: $1.5, Storage: {{data[5]}}, Qty: <input type="int" name="qty6"></p>
+                <p class="lead">Pid: 10007, Name: Tape, Price: $4.0, Storage: {{data[6]}}, Qty: <input type="int" name="qty7"></p>
+                <p class="lead">Pid: 10008, Name: Ruler, Price: $5.0, Storage: {{data[7]}}, Qty: <input type="int" name="qty8"></p>
+                <p class="lead">Pid: 10009, Name: Knife, Price: $50.0, Storage: {{data[8]}}, Qty: <input type="int" name="qty9"></p>
+                <p class="lead">Pid: 10010, Name: Knife, Price: $75.0, Storage: {{data[9]}}, Qty: <input type="int" name="qty10"></p>
+                <p class="lead">Pid: 10011, Name: Pan, Price: $22.5, Storage: {{data[10]}}, Qty: <input type="int" name="qty11"></p>
+                <p class="lead">Pid: 10012, Name: Bowl, Price: $5.0, Storage: {{data[11]}}, Qty: <input type="int" name="qty12"></p>
+                <p class="lead">Pid: 10013, Name: Bowl, Price: $10.0, Storage: {{data[12]}}, Qty: <input type="int" name="qty13"></p>
+                <p class="lead">Pid: 10014, Name: Monster Hunter, Price: $39.0, Storage: {{data[13]}}, Qty: <input type="int" name="qty14"></p>
+                <p class="lead">Pid: 10015, Name: Monster Hunter XX, Price: $49.0, Storage: {{data[14]}}, Qty: <input type="int" name="qty15"></p>
+                <p><input type="submit" value="Modify my store"></p>
+            </form>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>
